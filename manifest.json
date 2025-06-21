@@ -1,0 +1,72 @@
+{
+  "manifest_version": 3,
+  "name": "Twitch Points Collector",
+  "version": "0.1.0",
+  "description": "A Chrome extension to automatically claim Twitch channel points rewards.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab",
+    "scripting",
+    "webRequest",
+    "identity",
+    "windows"
+  ],
+  "host_permissions": [
+    "https://*.twitch.tv/*",
+    "https://api.twitch.tv/*",
+    "https://id.twitch.tv/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.twitch.tv/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Twitch Points Collector",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "commands": {
+    "open_logs": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+L"
+      },
+      "description": "Open logs window"
+    },
+    "open_config": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+C"
+      },
+      "description": "Open settings window"
+    },
+    "toggle_extension": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+T"
+      },
+      "description": "Enable/disable the extension"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*"],
+      "matches": ["https://*.twitch.tv/*"]
+    }
+  ]
+}

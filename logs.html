@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Twitch Points Collector Logs</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 10px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      margin-top: 0;
+      color: #333;
+    }
+    #logContainer {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      background-color: white;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+    .log-entry {
+      margin: 2px 0;
+      padding: 3px;
+      border-bottom: 1px solid #eee;
+      word-wrap: break-word;
+    }
+    .log-entry .timestamp {
+      color: #666;
+      margin-right: 8px;
+    }
+    .log-entry .level {
+      font-weight: bold;
+      margin-right: 8px;
+      min-width: 60px;
+      display: inline-block;
+    }
+    .log-entry .message {
+      color: #333;
+    }
+    .info .level { color: #2196F3; }
+    .warning .level { color: #FF9800; }
+    .error .level { color: #F44336; }
+    .debug .level { color: #9C27B0; }
+    
+    button {
+      padding: 8px 12px;
+      background-color: #6441a5;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin: 5px 5px 5px 0;
+      border-radius: 3px;
+    }
+    button:hover {
+      background-color: #503388;
+    }
+    .filter-container {
+      margin-bottom: 10px;
+      padding: 10px;
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    .stats-container {
+      margin-top: 10px;
+      padding: 8px;
+      background-color: #e8e8e8;
+      border-radius: 3px;
+      font-size: 12px;
+      color: #666;
+    }
+    .controls-container {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Twitch Points Collector Logs</h1>
+  <div class="filter-container">
+    <strong>Filters:</strong>
+    <div id="filterButtons"></div>
+  </div>
+  <div id="logContainer"></div>
+  <div class="stats-container" id="statsContainer"></div>
+  <div class="controls-container">
+    <button id="clearLogs">Clear logs</button>
+    <button id="refreshLogs">Update</button>
+    <label>
+      <input type="checkbox" id="autoScrollToggle" checked> Auto scrolling
+    </label>
+  </div>
+  <script src="logs.js"></script>
+</body>
+</html>

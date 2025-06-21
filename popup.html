@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Twitch Points Collector</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <h1>Twitch Points Collector</h1>
+  
+  <div class="status-section">
+    <div class="status-indicator" id="statusIndicator">●</div>
+    <span id="status">Status: loading...</span>
+  </div>
+  
+  <div class="controls-section">
+    <div class="toggle-group">
+      <label for="autostartToggle">
+        <input type="checkbox" id="autostartToggle">
+        Auto start with browser startup
+      </label>
+    </div>
+  </div>
+  
+  <div class="info-section" id="infoSection">
+    <div class="info-item">
+      <span class="info-label">Channels set up:</span>
+      <span class="info-value" id="channelCount">0</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">Opened tabs:</span>
+      <span class="info-value" id="openTabs">0</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">Status check interval:</span>
+      <span class="info-value" id="checkInterval">300s</span>
+    </div>
+  </div>
+  
+  <div class="buttons-section">
+    <button id="mainAction" class="primary-button">Start monitoring</button>
+    <div class="button-row">
+      <button id="openConfig" class="secondary-button">Settings</button>
+      <button id="openLog" class="secondary-button">Logs</button>
+    </div>
+    <button id="openStats" class="stats-button">📊 Rewards stats</button>
+  </div>
+  
+  <div class="version-info">
+    v0.1 | <span id="lastCheck">No checks</span>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

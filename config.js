@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
         showOverlay: result.showOverlay !== false,
         clientId: result.clientId || '',
         userId: result.userId || '',
-        redirectUri: result.redirectUri || 'https://pdpjlhjimipampbcgldnblldgighpaka.chromiumapp.org'
+        redirectUri: result.redirectUri || ''
       };
       
       console.log("Processed configuration:", config);
@@ -349,7 +349,7 @@ document.addEventListener("DOMContentLoaded", () => {
         showOverlay: showOverlayCheckbox ? showOverlayCheckbox.checked : true,
         clientId: clientIdInput ? clientIdInput.value.trim() : '',
         userId: userIdInput ? userIdInput.value.trim() : '',
-        redirectUri: redirectUriInput ? redirectUriInput.value.trim() : 'https://pdpjlhjimipampbcgldnblldgighpaka.chromiumapp.org'
+        redirectUri: redirectUriInput ? redirectUriInput.value.trim() : ''
       };
       
       console.log("Saving config:", config);
@@ -468,7 +468,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (showOverlayCheckbox) showOverlayCheckbox.checked = true;
         if (clientIdInput) clientIdInput.value = '';
         if (userIdInput) userIdInput.value = '';
-        if (redirectUriInput) redirectUriInput.value = 'https://pdpjlhjimipampbcgldnblldgighpaka.chromiumapp.org';
+        if (redirectUriInput) redirectUriInput.value = '';
         
         toggleWindowBehaviorSection();
         updateStatus("Settings reset to defaults");
@@ -509,7 +509,7 @@ document.addEventListener("DOMContentLoaded", () => {
         showOverlay: showOverlayCheckbox ? showOverlayCheckbox.checked : true,
         clientId: clientIdInput ? clientIdInput.value.trim() : '',
         userId: userIdInput ? userIdInput.value.trim() : '',
-        redirectUri: redirectUriInput ? redirectUriInput.value.trim() : 'https://pdpjlhjimipampbcgldnblldgighpaka.chromiumapp.org'
+        redirectUri: redirectUriInput ? redirectUriInput.value.trim() : ''
       };
       
       chrome.storage.local.set(config);

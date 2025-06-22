@@ -3,6 +3,23 @@ let channelStatus = {};
 let channels = [];
 let liveStreams = [];
 
+function formatDate(dateString) {
+  if (!dateString) return 'Never';
+  
+  const date = new Date(dateString);
+  const userLocale = navigator.language || 'en-US';
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  
+  return date.toLocaleString(userLocale, {
+    timeZone: timeZone,
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
 async function loadStats() {
   console.log("Loading stats...");
   
@@ -103,12 +120,16 @@ function renderChannelStats() {
     return;
   }
 
-  if (!channels || channels.length === 0) {
+  const allChannelsWithStats = Object.keys(rewardStats);
+
+  const allChannels = [...new Set([...channels, ...allChannelsWithStats])];
+
+  if (allChannels.length === 0) {
     container.innerHTML = '<div class="no-data">No channels set up</div>';
     return;
   }
 
-  const channelsHtml = channels.map(channel => {
+  const channelsHtml = allChannels.map(channel => {
     const stats = rewardStats[channel] || {
       totalRewards: 0,
       errors: 0,
@@ -116,18 +137,32 @@ function renderChannelStats() {
       lastReward: null,
       firstReward: null
     };
-    
+
+    const isActiveChannel = channels.includes(channel);
     const isLive = channelStatus[channel] === 'live';
     const today = new Date().toDateString();
     const todayCount = stats.dailyStats[today] || 0;
     
+    let statusClass = 'status-offline';
+    let statusTitle = 'Offline';
+    
+    if (!isActiveChannel) {
+      statusClass = 'status-inactive';
+      statusTitle = 'Not in monitoring list';
+    } else if (isLive) {
+      statusClass = 'status-live';
+      statusTitle = 'Live';
+    }
+    
     return `
-      <div class="channel-card">
+      <div class="channel-card ${!isActiveChannel ? 'inactive-channel' : ''}">
         <div class="channel-name">
           ${channel}
-          <span class="channel-status ${isLive ? 'status-live' : 'status-offline'}" 
-                title="${isLive ? 'Live' : 'Offline'}"></span>
+          <span class="channel-status ${statusClass}" 
+                title="${statusTitle}"></span>
         </div>
+        
+        ${!isActiveChannel ? '<div class="inactive-notice">Channel not in current monitoring list</div>' : ''}
         
         <div class="stat-item">
           <span class="stat-label">Total rewards collected:</span>
@@ -186,6 +221,7 @@ function updateLastUpdated() {
     second: '2-digit'
   })}`;
 }
+
 function forceRefresh() {
   console.log("Forcing stats refresh...");
   loadStats();
@@ -312,6 +348,21 @@ function addStyles() {
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
+    .inactive-channel {
+      opacity: 0.7;
+      border-left: 4px solid #f39c12;
+    }
+
+    .inactive-notice {
+      background: #fff3cd;
+      color: #856404;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-bottom: 10px;
+      border: 1px solid #ffeaa7;
+    }
+
     .channel-name {
       font-size: 16px;
       font-weight: bold;
@@ -335,6 +386,10 @@ function addStyles() {
 
     .status-offline {
       background-color: #95a5a6;
+    }
+
+    .status-inactive {
+      background-color: #f39c12;
     }
 
     .stat-item {

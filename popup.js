@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateUI() {
     channelCount.textContent = currentStatus.channelCount;
     openTabs.textContent = currentStatus.openTabs;
-    checkInterval.textContent = `${currentStatus.interval}с`;
+    checkInterval.textContent = `${currentStatus.interval}s`;
     
     if (currentStatus.channelCount === 0) {
       mainActionButton.textContent = "Setup Channels";

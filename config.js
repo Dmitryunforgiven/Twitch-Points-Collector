@@ -234,7 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
       updateStatus(errors.join("<br>"), true);
     } else if (channelsText) {
       const channels = channelsText.trim().split("\n").map(c => c.trim()).filter(c => c);
-      updateStatus(`Ready for saving: ${channels.length} channels, interval ${delayValue}с`);
+      updateStatus(`Ready for saving: ${channels.length} channels, interval ${delayValue}s`);
     }
 
     return isValid;
@@ -325,7 +325,6 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("Couldn't add a handler for redirectUriInput - element not found");
   }
 
-  // Сохранение конфигурации
   if (saveButton) {
     saveButton.addEventListener("click", async () => {
       console.log("Save button clicked");
@@ -376,7 +375,7 @@ document.addEventListener("DOMContentLoaded", () => {
           console.log("Force update overlay response:", response);
         });
         
-        let statusMessage = `✅ Config saved!<br>Channels: ${channels.length}, Interval: ${delayValue}с<br>`;
+        let statusMessage = `✅ Config saved!<br>Channels: ${channels.length}, Interval: ${delayValue}s<br>`;
         statusMessage += `Separate windows: ${config.separateWindow ? 'enabled' : 'disabled'}<br>`;
         statusMessage += `Overlay: ${config.showOverlay ? 'enabled' : 'disabled'}<br>`;
         statusMessage += `Extended logs: ${config.detailedLogging ? 'enabled' : 'disabled'}`;

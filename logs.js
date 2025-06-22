@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "log") {
       appendLog(message.log);
-      console.log("Новый лог получен:", message.log);
+      console.log("New log received:", message.log);
     }
   });
 

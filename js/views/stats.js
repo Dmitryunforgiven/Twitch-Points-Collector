@@ -73,9 +73,13 @@ function updateSummary() {
     sum + (channel.totalRewards || 0), 0
   );
 
+  const totalPoints = Object.values(rewardStats).reduce((sum, channel) =>
+    sum + (channel.totalPoints || 0), 0
+  );
+
   const today = new Date().toDateString();
   const todayRewards = Object.values(rewardStats).reduce((sum, channel) => 
-    sum + (channel.dailyStats?.[today] || 0), 0
+    sum + (channel.dailyStats?.[today]?.rewards || 0), 0
   );
 
   const activeChannels = channels.filter(channel => 
@@ -95,6 +99,7 @@ function updateSummary() {
 
   console.log("Summary update:", {
     totalRewards,
+    totalPoints,
     todayRewards,
     activeChannels,
     avgPerDay
@@ -102,12 +107,14 @@ function updateSummary() {
 
   const elements = {
     totalRewards: document.getElementById('totalRewards'),
+    totalPoints: document.getElementById('totalPoints'),
     todayRewards: document.getElementById('todayRewards'),
     activeChannels: document.getElementById('activeChannels'),
     avgPerDay: document.getElementById('avgPerDay')
   };
 
   if (elements.totalRewards) elements.totalRewards.textContent = totalRewards;
+  if (elements.totalPoints) elements.totalPoints.textContent = totalPoints.toLocaleString();
   if (elements.todayRewards) elements.todayRewards.textContent = todayRewards;
   if (elements.activeChannels) elements.activeChannels.textContent = activeChannels;
   if (elements.avgPerDay) elements.avgPerDay.textContent = avgPerDay.toFixed(1);
@@ -132,16 +139,18 @@ function renderChannelStats() {
   const channelsHtml = allChannels.map(channel => {
     const stats = rewardStats[channel] || {
       totalRewards: 0,
+      totalPoints: 0,
       errors: 0,
       dailyStats: {},
       lastReward: null,
-      firstReward: null
+      firstReward: null,
+      subMultiplier: 1.0
     };
 
     const isActiveChannel = channels.includes(channel);
     const isLive = channelStatus[channel] === 'live';
     const today = new Date().toDateString();
-    const todayCount = stats.dailyStats[today] || 0;
+    const todayCount = stats.dailyStats[today]?.rewards || 0;
     
     let statusClass = 'status-offline';
     let statusTitle = 'Offline';
@@ -164,6 +173,16 @@ function renderChannelStats() {
         
         ${!isActiveChannel ? '<div class="inactive-notice">Channel not in current monitoring list</div>' : ''}
         
+        <div class="stat-item">
+          <span class="stat-label">Total Points:</span>
+          <span class="stat-value">${(stats.totalPoints || 0).toLocaleString()}</span>
+        </div>
+
+        <div class="stat-item">
+          <span class="stat-label">Sub. Multiplier:</span>
+          <span class="stat-value">${stats.subMultiplier || 1.0}x</span>
+        </div>
+
         <div class="stat-item">
           <span class="stat-label">Total rewards collected:</span>
           <span class="stat-value">${stats.totalRewards || 0}</span>

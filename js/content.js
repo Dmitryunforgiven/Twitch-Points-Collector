@@ -519,6 +519,7 @@ function checkAndClaimRewards() {
             action: "rewardClaimed",
             channel: currentChannel,
             success: true,
+            points: 50,
             timestamp: new Date().toISOString(),
             method: "exact_search"
           }, (response) => {
@@ -541,6 +542,7 @@ function checkAndClaimRewards() {
               action: "rewardClaimed",
               channel: extractChannelName(),
               success: success,
+              points: 50,
               timestamp: new Date().toISOString(),
               method: "exact_search_corrected",
               error: "Button still present after click"
@@ -556,6 +558,7 @@ function checkAndClaimRewards() {
             action: "rewardClaimed",
             channel: extractChannelName(),
             success: false,
+            points: 0,
             error: error.message,
             timestamp: new Date().toISOString(),
             method: "exact_search_error"
@@ -635,6 +638,7 @@ function checkAndClaimRewards() {
                   action: "rewardClaimed",
                   channel: currentChannel,
                   success: true,
+                  points: 50,
                   timestamp: new Date().toISOString(),
                   method: "selector_search",
                   selector: selector

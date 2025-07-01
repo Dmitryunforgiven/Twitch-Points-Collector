@@ -1,7 +1,7 @@
 let clientId = "";
 let userId = "";
 let redirectUri = "";
-let authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=user:read:follows`;
+let authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=user:read:follows+user:read:subscriptions`;
 let oAuth = "";
 let channelStatus = {};
 let channelTabs = {};
@@ -246,7 +246,7 @@ async function loadSettings() {
   });
 }
 
-function updateRewardStats(channel, success = true) {
+function updateRewardStats(channel, success = true, points = 0) {
   if (!channel) return;
   
   const today = new Date().toDateString();
@@ -255,10 +255,12 @@ function updateRewardStats(channel, success = true) {
   if (!rewardStats[channel]) {
     rewardStats[channel] = {
       totalRewards: 0,
+      totalPoints: 0,
       errors: 0,
       lastReward: null,
       firstReward: null,
-      dailyStats: {}
+      dailyStats: {},
+      subMultiplier: 1.0
     };
   }
   
@@ -272,7 +274,11 @@ function updateRewardStats(channel, success = true) {
       }
     }
     
+    const multiplier = rewardStats[channel].subMultiplier || 1.0;
+    const calculatedPoints = points * multiplier;
+
     rewardStats[channel].totalRewards++;
+    rewardStats[channel].totalPoints = (rewardStats[channel].totalPoints || 0) + calculatedPoints;
     rewardStats[channel].lastReward = now;
     
     if (!rewardStats[channel].firstReward) {
@@ -280,11 +286,12 @@ function updateRewardStats(channel, success = true) {
     }
     
     if (!rewardStats[channel].dailyStats[today]) {
-      rewardStats[channel].dailyStats[today] = 0;
+      rewardStats[channel].dailyStats[today] = { rewards: 0, points: 0 };
     }
-    rewardStats[channel].dailyStats[today]++;
+    rewardStats[channel].dailyStats[today].rewards++;
+    rewardStats[channel].dailyStats[today].points += calculatedPoints;
     
-    console.log(`Reward registered for ${channel}. Total: ${rewardStats[channel].totalRewards}`);
+    logMessage(`Reward registered for ${channel}. Points: ${calculatedPoints} (Base: ${points}, Multiplier: ${multiplier}). Total points: ${rewardStats[channel].totalPoints}`);
   } else {
     rewardStats[channel].errors++;
     console.log(`Reward collection error for ${channel}. Total errors: ${rewardStats[channel].errors}`);
@@ -373,7 +380,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     
   } else if (message.action === "rewardClaimed") {
     logMessage(`Reward collection message: channel=${message.channel}, success=${message.success}`);
-    updateRewardStats(message.channel, message.success);
+    updateRewardStats(message.channel, message.success, message.points);
     sendResponse({ success: true });
   
   } else if (message.action === "rewardNotFound") {
@@ -848,6 +855,16 @@ async function getFollowedList() {
           channelsToClose.push(channel);
         }
       }
+
+      for (const channel of channels) {
+        const streamData = data.data.find(
+            (stream) => stream.user_login.toLowerCase() === channel.toLowerCase()
+        );
+
+        if (streamData) {
+            await getChannelSubscribtion(streamData.user_id);
+        }
+      }
       
       for (const channel of channelsToClose) {
         logMessage(`${channel} became offline. Closing ${windowSettings.separateWindow ? 'window' : 'tab'}...`);
@@ -901,6 +918,51 @@ async function getFollowedList() {
       
       await new Promise(resolve => setTimeout(resolve, 5000 * retryCount));
         }
+    }
+}
+
+async function getChannelSubscribtion(channelId) {
+    if (!channelId) {
+        logMessage("Cannot get subscription status without channel ID", "error");
+        return;
+    }
+
+    const headers = {
+        "Authorization": `Bearer ${oAuth}`,
+        "Client-ID": clientId,
+    };
+
+    const apiUrl = `https://api.twitch.tv/helix/subscriptions/user?broadcaster_id=${channelId}&user_id=${userId}`;
+    debugLog("API subscription request", { url: apiUrl });
+
+    try {
+        const response = await fetch(apiUrl, { headers });
+
+        if (response.status === 200) {
+            const subData = await response.json();
+            const tier = subData.data[0].tier;
+            let multiplier = 1.0;
+            if (tier === "1000") multiplier = 1.2;
+            if (tier === "2000") multiplier = 1.5;
+            if (tier === "3000") multiplier = 2.0;
+
+            logMessage(`User is subscribed to channel ${channelId}. Tier: ${tier}, Multiplier: ${multiplier}`);
+            // Save the multiplier
+            if (!rewardStats[channelId]) rewardStats[channelId] = {};
+            rewardStats[channelId].subMultiplier = multiplier;
+            chrome.storage.local.set({ rewardStats });
+
+        } else if (response.status === 404) {
+            logMessage(`User is not subscribed to channel ${channelId}.`);
+            if (!rewardStats[channelId]) rewardStats[channelId] = {};
+            rewardStats[channelId].subMultiplier = 1.0;
+            chrome.storage.local.set({ rewardStats });
+        } else {
+            const errorText = await response.text();
+            logMessage(`Error checking subscription for channel ${channelId}: ${response.status} - ${errorText}`, "error");
+        }
+    } catch (error) {
+        logMessage(`Error fetching subscription for channel ${channelId}: ${error.message}`, "error");
     }
 }
 
